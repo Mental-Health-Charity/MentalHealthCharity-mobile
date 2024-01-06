@@ -3,12 +3,12 @@ import React from "react";
 
 type Props = {};
 
-const Register = (props: Props) => {
+const Home = (props: Props) => {
   return (
     <View>
-      <Text>Register</Text>
+      <Text>Home</Text>
     </View>
   );
 };
 
-export default Register;
+export default Home;
