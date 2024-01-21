@@ -1,7 +1,8 @@
-import { useContext, createContext, useState } from "react";
+import { useContext, createContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { createCookies } from "../utils/cookies";
+import { useRouter, useSegments } from "expo-router";
 
 export interface User {
   full_name: string;
@@ -26,6 +27,7 @@ interface AccessToken {
 
 interface AuthContextType {
   user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
   login: (loginData: LoginUserData) => Promise<void>;
   logout: () => void;
   signIn: (userData: User) => Promise<void>;
@@ -57,32 +59,34 @@ const useProvideAuth = (userData: User | null) => {
   const login = async (loginDataParams: LoginUserData) => {
     const { username, password } = loginDataParams;
 
-    const res = await axios.post(`${process.env.PUBLIC_ACCESS_TOKEN_URL}`, {
-      username,
-      password,
-    });
-
-    const data: AccessToken = await res.data;
-
-    if (res.status == 200) {
-      const accessToken = res.data?.access_token || "";
-      createCookies(username, accessToken);
-      const authorization = `${data.token_type} ${data.access_token}`;
-
-      const getUserData = axios.get(`${process.env.PUBLIC_LOGIN_ME_URL}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: authorization,
-        },
+    try {
+      const res = await axios.post(`${process.env.PUBLIC_ACCESS_TOKEN_URL}`, {
+        username,
+        password,
       });
-      const userDataValue: User = (await getUserData).data;
-      setUser(userDataValue);
-      console.log("USERDATA: ", user);
-      setError(undefined);
-    } else {
-      console.log("error", data);
+
+      if (res.status === 200) {
+        const accessToken = res.data?.access_token || "";
+        createCookies(username, accessToken);
+        const authorization = `${res.data.token_type} ${accessToken}`;
+
+        const getUserData = axios.get(`${process.env.PUBLIC_LOGIN_ME_URL}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: authorization,
+          },
+        });
+        const userDataValue: User = (await getUserData).data;
+        setUser(userDataValue);
+        setError(undefined);
+      }
+    } catch (error: any) {
+      console.error("Błąd logowania: ", error);
+      setUser(null);
+      setError(error.response.data);
     }
   };
+
   const logout = async () => {
     try {
       await SecureStore.deleteItemAsync("accessToken");
@@ -95,11 +99,26 @@ const useProvideAuth = (userData: User | null) => {
 
   return {
     user,
+    setUser,
     login,
     logout,
     signIn,
     error,
   };
+};
+
+const useProtectedRoutes = (user: User | null) => {
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    const inAuthGroup = segments[0] === "auth";
+    if (!user && inAuthGroup) {
+      router.replace("/Login");
+    } else {
+      router.replace("(tabs)");
+    }
+  }, [user, segments]);
 };
 
 export const AuthProvider = ({
@@ -110,6 +129,7 @@ export const AuthProvider = ({
   user: User | null;
 }) => {
   const auth = useProvideAuth(user);
+  useProtectedRoutes(user);
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };

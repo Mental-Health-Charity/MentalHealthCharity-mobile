@@ -8,7 +8,7 @@ import React from "react";
 
 type Props = {
   title: string;
-  onPress: (event: GestureResponderEvent) => void;
+  onPress: (event: any) => any;
 };
 
 const PrimaryButton = (props: Props) => {
@@ -17,7 +17,7 @@ const PrimaryButton = (props: Props) => {
     <>
       <TouchableOpacity
         onPress={onPress}
-        className="w-full bg-yellow-600 p-3 rounded-2xl mb-3 "
+        className="w-full bg-yellow-500 p-3 rounded-2xl mb-3 "
       >
         <Text className="text-white">{title}</Text>
       </TouchableOpacity>

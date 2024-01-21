@@ -5,9 +5,8 @@ import {
   Image,
   TextInput,
   TouchableOpacity,
-  RCTNativeAppEventEmitter,
 } from "react-native";
-import React, { useState } from "react";
+import React from "react";
 import { StatusBar } from "expo-status-bar";
 import Animated, {
   FadeIn,
@@ -15,22 +14,21 @@ import Animated, {
   FadeInUp,
   FadeOut,
 } from "react-native-reanimated";
-import PrimaryButton from "../components/common/PrimaryButton";
+import PrimaryButton from "../../components/common/PrimaryButton";
 import { useNavigation } from "@react-navigation/native";
 
 type Props = {};
 
-const Login = (props: Props) => {
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-
-  const handleSubmit = (e: RCTNativeAppEventEmitter) => {};
+const Register = (props: Props) => {
+  const handleSubmit = () => {
+    console.log("Submit");
+  };
   return (
     <View className="w-full h-full bg-white">
       <StatusBar style="light" />
       <Image
         className="absolute w-full h-full"
-        source={require("../assets/background.png")}
+        source={require("../../assets/background.png")}
       />
       <View className="flex justify-around w-full h-full pt-24 pb-10">
         <View className="flex items-center">
@@ -38,7 +36,7 @@ const Login = (props: Props) => {
             entering={FadeInUp.duration(1000).springify()}
             className="text-5xl font-bold tracking-wider text-white"
           >
-            Zaloguj się
+            Zarejstruj się
           </Animated.Text>
         </View>
         <View className="flex items-center mx-4 space-y-4">
@@ -47,6 +45,15 @@ const Login = (props: Props) => {
             className="w-full p-5 bg-gray-300 rounded-2xl"
           >
             <TextInput placeholder="Email" placeholderTextColor={"grey"} />
+          </Animated.View>
+          <Animated.View
+            entering={FadeInDown.duration(1000).springify()}
+            className="w-full p-5 bg-gray-300 rounded-2xl"
+          >
+            <TextInput
+              placeholder="Nazwa Użytkownika"
+              placeholderTextColor={"grey"}
+            />
           </Animated.View>
 
           <Animated.View
@@ -60,7 +67,17 @@ const Login = (props: Props) => {
             />
           </Animated.View>
           <Animated.View
-            className="w-full "
+            entering={FadeInDown.delay(200).duration(1000).springify()}
+            className="w-full p-5 bg-gray-300 rounded-2xl"
+          >
+            <TextInput
+              placeholder="Potwierdź hasło"
+              placeholderTextColor={"grey"}
+              secureTextEntry
+            />
+          </Animated.View>
+          <Animated.View
+            className="w-full mt-6"
             entering={FadeInDown.delay(400).duration(1000).springify()}
           >
             <PrimaryButton onPress={handleSubmit} title="Zaloguj się" />
@@ -72,7 +89,7 @@ const Login = (props: Props) => {
           <Text className="text-gray-400 text-center ">
             Nie masz konta?
             <TouchableOpacity>
-              <Text className="text-blue-400 m-auto ">Zarejestruj się</Text>
+              <Text className="text-blue-400 ">Zarejestruj się</Text>
             </TouchableOpacity>
           </Text>
         </Animated.View>
@@ -81,4 +98,4 @@ const Login = (props: Props) => {
   );
 };
 
-export default Login;
+export default Register;

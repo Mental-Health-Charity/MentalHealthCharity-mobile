@@ -1,9 +1,13 @@
-import { Stack } from "expo-router";
+import { Slot, Stack, useRouter } from "expo-router";
+import { AuthProvider, User, useAuth } from "./contexts/authContext";
+import { restoreUserSession } from "./utils/cookies";
+import { useEffect } from "react";
 
-const StackLayout = () => {
+export default function Root() {
+  const user = restoreUserSession();
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)"></Stack.Screen>
-    </Stack>
+    <AuthProvider user={null}>
+      <Slot />
+    </AuthProvider>
   );
-};
+}
