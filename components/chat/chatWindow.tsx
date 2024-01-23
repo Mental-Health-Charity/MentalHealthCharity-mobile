@@ -5,7 +5,6 @@ import { useAuth, User } from "../../app/contexts/authContext";
 
 import React, { useEffect, useState } from "react";
 import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import { router } from "expo-router";
 
 type Props = {};
 
@@ -29,7 +28,7 @@ const ChatWindow = (props: Props) => {
   });
 
   const handleChatRedirect = (item: any) => {
-    router.push(`(chats)/${item.id}`);
+    // router.push(`(chats)/${item.id}`);
     console.log(`Pressed on chat with ID: ${item.id}`);
   };
 

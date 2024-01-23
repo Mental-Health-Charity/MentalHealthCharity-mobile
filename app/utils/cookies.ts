@@ -1,15 +1,14 @@
 import * as SecureStore from "expo-secure-store";
+import { User } from "../contexts/authContext";
 
-export const createCookies = async (name: string, value: string) => {
+export const createCookies = async (key: string, value: string) => {
   try {
-    // Zapisz wartość w SecureStore
-    await SecureStore.setItemAsync(name, value);
-    console.log("SecureStore.setItemAsync =>", `${name}: ${value}`);
+    await SecureStore.setItemAsync(key, value);
+    console.log("SecureStore.setItemAsync =>", `${key} ${value}`);
   } catch (error) {
     console.error("Błąd podczas zapisywania w SecureStore:", error);
   }
 };
-
 export const getCookiesAuth = async () => {
   try {
     const jwtToken = await SecureStore.getItemAsync("jwtToken");
@@ -36,8 +35,9 @@ export const restoreUserSession = async () => {
   try {
     const jwtToken = await SecureStore.getItemAsync("jwtToken");
     const jwtTokenType = await SecureStore.getItemAsync("jwtTokenType");
+
     if (jwtToken && jwtTokenType) {
-      const res = await fetch(`${process.env.PUBLIC_LOGIN_ME_URL}`, {
+      const res = await fetch(`${process.env.EXPO_PUBLIC_LOGIN_ME_URL}`, {
         method: "get",
         headers: {
           "Content-Type": "application/json",
@@ -49,10 +49,17 @@ export const restoreUserSession = async () => {
         throw new Error(`Nie udało się pobrać tokenu: ${res.status}`);
       }
 
-      return res.json();
+      const data = await res.json();
+
+      console.log("Odpowiedź serwera", data);
+
+      return data as User; // Zwracamy bezpośrednio obiekt, a nie obiekt w Promise
     }
+
+    console.log("nie ma tokenu");
+    return null; // Zwracamy null, jeśli brakuje tokenu
   } catch (error) {
-    console.log(error);
-    return null;
+    console.log("jest error", error);
+    return null; // Zwracamy null w przypadku błędu
   }
 };

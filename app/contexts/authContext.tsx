@@ -2,7 +2,6 @@ import { useContext, createContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { createCookies } from "../utils/cookies";
-import { useRouter, useSegments } from "expo-router";
 
 export interface User {
   full_name: string;
@@ -34,20 +33,38 @@ interface AuthContextType {
   error: AccessToken | undefined;
 }
 
+const TOKEN_KEY = "my-jwt";
+
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 const useProvideAuth = (userData: User | null) => {
   const [user, setUser] = useState<User | null>(userData);
   const [error, setError] = useState<AccessToken>();
+  const [isLoading, setIsLoading] = useState(true);
+
+  //  Po wejsciu na apke, sprawdzasz czy jest zapisany JWT token w storage, jesli jest
+  // to wysylasz request na  ( JESLI NIE MA JWT TO NIE WYKONUJ !!!! )
+  // const getUserData = axios.get(`${process.env.PUBLIC_LOGIN_ME_URL}`, {
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     Authorization: authorization,
+  //   },
+  // });
+  // i po prostu aktualizujesz dane usera, czy nic sie nie zmienilo od ostatniego wejscia na apke
 
   const signIn = async (newUserParams: User) => {
     const { username, password, full_name } = newUserParams;
     const res = await axios.post(
-      `${process.env.PUBLIC_BASE_URL}/api/v1/users/open`,
-      { username, password, full_name }
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/users/open`,
+      newUserParams.toString(),
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
     );
     const data: AccessToken = await res.data;
-    await login({ username, password });
+    //await login({ username, password });
     if (res.status === 200) {
       setError(undefined);
     } else {
@@ -56,31 +73,84 @@ const useProvideAuth = (userData: User | null) => {
     }
   };
 
+  // const login = async (loginDataParams: LoginUserData): Promise<UserData | null> => {
+  //   const { username, password } = loginDataParams;
+
+  //   try {
+  // const apiRes = await fetch(
+  //   `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/login/access-token`,
+  //   {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/x-www-form-urlencoded",
+  //     },
+  //     body: new URLSearchParams(loginDataParams as any),
+  //   }
+  // );
+
+  //     const resText = await apiRes.text();
+  //     const res = JSON.parse(resText);
+  //     const accessToken = res.access_token || "";
+  //     createCookies(TOKEN_KEY, accessToken);
+  //     const authorization = `${res.token_type} ${accessToken}`;
+
+  //     const getUserData = await fetch(
+  //       `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/users/me`,
+  //       {
+  //         method: "get",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: authorization,
+  //         },
+  //       }
+  //     );
+
+  //     const userDataValue = await getUserData.json();
+  //     setUser(userDataValue);
+  //     setError(undefined);
+  //   } catch (error: any) {
+  //     setUser(null);
+  //     setError(error.response.data);
+  //   }
+  // };
+
   const login = async (loginDataParams: LoginUserData) => {
     const { username, password } = loginDataParams;
 
     try {
-      const res = await axios.post(`${process.env.PUBLIC_ACCESS_TOKEN_URL}`, {
-        username,
-        password,
-      });
+      const res = await axios.post<AccessToken>(
+        `${process.env.EXPO_PUBLIC_ACCESS_TOKEN_URL}`,
+        new URLSearchParams({ username, password }).toString(),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
 
       if (res.status === 200) {
-        const accessToken = res.data?.access_token || "";
-        createCookies(username, accessToken);
+        const accessToken = res.data.access_token || "";
+        const tokenType = res.data.token_type || "";
+        createCookies("jwtToken", accessToken);
+        createCookies("jwtTokenType", tokenType);
         const authorization = `${res.data.token_type} ${accessToken}`;
 
-        const getUserData = axios.get(`${process.env.PUBLIC_LOGIN_ME_URL}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: authorization,
-          },
-        });
-        const userDataValue: User = (await getUserData).data;
+        const getUserData = axios.get<User>(
+          `${process.env.EXPO_PUBLIC_LOGIN_ME_URL}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: authorization,
+            },
+          }
+        );
+        const userDataValue = (await getUserData).data;
+        console.log("userData from api", userDataValue);
         setUser(userDataValue);
         setError(undefined);
       }
     } catch (error: any) {
+      console.error("Error response:", error.response.data);
       console.error("Błąd logowania: ", error);
       setUser(null);
       setError(error.response.data);
@@ -107,20 +177,6 @@ const useProvideAuth = (userData: User | null) => {
   };
 };
 
-const useProtectedRoutes = (user: User | null) => {
-  const segments = useSegments();
-  const router = useRouter();
-
-  useEffect(() => {
-    const inAuthGroup = segments[0] === "auth";
-    if (!user && inAuthGroup) {
-      router.replace("/Login");
-    } else {
-      router.replace("(tabs)");
-    }
-  }, [user, segments]);
-};
-
 export const AuthProvider = ({
   children,
   user,
@@ -129,7 +185,6 @@ export const AuthProvider = ({
   user: User | null;
 }) => {
   const auth = useProvideAuth(user);
-  useProtectedRoutes(user);
 
   return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
 };
