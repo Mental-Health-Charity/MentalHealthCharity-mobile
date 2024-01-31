@@ -1,4 +1,17 @@
+import { IMessage } from "react-native-gifted-chat";
 import { User } from "../contexts/authContext";
+
+export type Contract = {
+  is_confirmed: boolean;
+  content: string;
+  id: number;
+};
+
+export interface Report {
+  report_type: string;
+  subject: string;
+  description: string;
+}
 
 export interface ChatData {
   items: Chat[];
@@ -16,7 +29,7 @@ export interface Chat {
   participants?: User[];
 }
 
-export interface Message {
+export interface Message extends IMessage {
   content: string;
   id: number;
   sender: User;

@@ -17,20 +17,32 @@ import Animated, {
 } from "react-native-reanimated";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import { useAuth } from "../contexts/authContext";
-import { Formik, useFormikContext, FormikProps, FormikHelpers } from "formik";
+import { Formik } from "formik";
 import * as yup from "yup";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { AuthStackParamList } from "../../components/Router";
 
 type MyValues = {
   username: string;
   password: string;
 };
 
+type LoginScreenNavigationProp = NativeStackNavigationProp<
+  AuthStackParamList,
+  "Login"
+>;
+
+interface LoginProps {
+  navigation: LoginScreenNavigationProp;
+}
+
 const loginValidationSchema = yup.object().shape({
   username: yup.string().required("Nazwa użytkownika jest wymagana"),
   password: yup.string().required("Proszę podać hasło"),
 });
 
-const Login = () => {
+const Login: React.FC<LoginProps> = ({ navigation }) => {
   const { login, user, error } = useAuth();
 
   const initialValues: MyValues = { username: "", password: "" };
@@ -50,7 +62,7 @@ const Login = () => {
             Zaloguj się
           </Animated.Text>
         </View>
-        <View className="flex items-center mx-4 space-y-4">
+        <View className="fixed flex items-center mx-4 space-y-4">
           <Formik
             validationSchema={loginValidationSchema}
             initialValues={initialValues}
@@ -101,7 +113,7 @@ const Login = () => {
         >
           <Text className="text-center text-gray-400 ">
             Nie masz konta?
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Register")}>
               <Text className="m-auto text-blue-400 ">Zarejestruj się</Text>
             </TouchableOpacity>
           </Text>

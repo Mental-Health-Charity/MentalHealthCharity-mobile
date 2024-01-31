@@ -2,6 +2,8 @@ import { AuthProvider, User } from "./contexts/authContext";
 import Router from "../components/Router";
 import { restoreUserSession } from "./utils/cookies";
 import { useEffect, useState } from "react";
+import { ChatProvider } from "./contexts/chatContext";
+import "react-native-gesture-handler";
 
 const App = () => {
   const [user, setUser] = useState<User | null>(null);
@@ -24,7 +26,9 @@ const App = () => {
 
   return (
     <AuthProvider user={user}>
-      <Router />
+      <ChatProvider>
+        <Router />
+      </ChatProvider>
     </AuthProvider>
   );
 };

@@ -54,6 +54,7 @@ const useProvideAuth = (userData: User | null) => {
 
   const signIn = async (newUserParams: User) => {
     const { username, password, full_name } = newUserParams;
+    console.log(newUserParams);
     const res = await axios.post(
       `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/users/open`,
       newUserParams.toString(),
@@ -64,7 +65,7 @@ const useProvideAuth = (userData: User | null) => {
       }
     );
     const data: AccessToken = await res.data;
-    //await login({ username, password });
+    await login({ username, password });
     if (res.status === 200) {
       setError(undefined);
     } else {
@@ -72,47 +73,6 @@ const useProvideAuth = (userData: User | null) => {
       console.log("error: ", data);
     }
   };
-
-  // const login = async (loginDataParams: LoginUserData): Promise<UserData | null> => {
-  //   const { username, password } = loginDataParams;
-
-  //   try {
-  // const apiRes = await fetch(
-  //   `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/login/access-token`,
-  //   {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/x-www-form-urlencoded",
-  //     },
-  //     body: new URLSearchParams(loginDataParams as any),
-  //   }
-  // );
-
-  //     const resText = await apiRes.text();
-  //     const res = JSON.parse(resText);
-  //     const accessToken = res.access_token || "";
-  //     createCookies(TOKEN_KEY, accessToken);
-  //     const authorization = `${res.token_type} ${accessToken}`;
-
-  //     const getUserData = await fetch(
-  //       `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/users/me`,
-  //       {
-  //         method: "get",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: authorization,
-  //         },
-  //       }
-  //     );
-
-  //     const userDataValue = await getUserData.json();
-  //     setUser(userDataValue);
-  //     setError(undefined);
-  //   } catch (error: any) {
-  //     setUser(null);
-  //     setError(error.response.data);
-  //   }
-  // };
 
   const login = async (loginDataParams: LoginUserData) => {
     const { username, password } = loginDataParams;
