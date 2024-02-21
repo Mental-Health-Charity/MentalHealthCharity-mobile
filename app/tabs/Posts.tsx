@@ -7,10 +7,18 @@ import {
   getVolunteerCourses,
 } from "../utils/getArticles";
 import BlogCard from "../../components/blog/blogCard";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MainStackParamList } from "../../components/Router";
 
-type Props = {};
+type ArticleScreenNavigationProp = NativeStackNavigationProp<
+  MainStackParamList,
+  "ArticleScreen"
+>;
 
-const Post = (props: Props) => {
+type Props = { navigation: any };
+
+const Posts = ({ navigation }: Props) => {
   const [articles, setArtiicles] = useState<Articles>();
   const [loading, setLoading] = useState(true);
 
@@ -36,7 +44,11 @@ const Post = (props: Props) => {
         data={articlesArray}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <TouchableOpacity>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ArticleScreen", { id: item.id })
+            }
+          >
             <BlogCard
               banner_url="https://i.imgur.com/5DLmMPL.jpeg"
               date={item.creation_date}
@@ -50,4 +62,4 @@ const Post = (props: Props) => {
   );
 };
 
-export default Post;
+export default Posts;

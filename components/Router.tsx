@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   NavigationContainer,
   RouteProp,
@@ -16,28 +16,61 @@ import Profile from "../app/tabs/Profile";
 import Register from "../app/auth/Register";
 import Chats from "../app/tabs/Chats";
 import ChatScreen from "./chat/ChatScreen";
-import Post from "../app/tabs/Post";
+import Posts from "../app/tabs/Posts";
+import ArticleScreen from "../app/screens/ArticleScreen";
+import ProfileModal from "./profile/profileModal";
 
 export type AuthStackParamList = {
   Login: undefined;
   Register: undefined;
 };
 
-export type ChatStackParamList = {
-  ChatScreen?: any;
+export type MainStackParamList = {
+  ChatScreen?: undefined;
+  AuthScreens?: undefined;
+  ArticleScreen?: any;
 };
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<MainStackParamList>();
 const Tab = createBottomTabNavigator();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 export const MyTabs = () => {
+  const { user, logout } = useAuth();
+  const [isModalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen name="Chats" component={Chats} />
-      <Tab.Screen name="Profile" component={Profile} />
-      <Tab.Screen name="Posts" component={Post} />
-    </Tab.Navigator>
+    <>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={Home} />
+        <Tab.Screen name="Chats" component={Chats} />
+        <Tab.Screen
+          name="Profile"
+          component={Profile}
+          listeners={{
+            tabPress: () => {
+              console.log("Im opening");
+              openModal();
+            },
+          }}
+        />
+        <Tab.Screen name="Posts" component={Posts} />
+      </Tab.Navigator>
+      <ProfileModal
+        isVisible={isModalVisible}
+        onClose={closeModal}
+        username={user?.username}
+        role={user?.user_role}
+        onLogout={() => logout()}
+      />
+    </>
   );
 };
 
@@ -67,6 +100,11 @@ const Router = () => {
         <>
           <MyTabs />
           <Stack.Screen name="ChatScreen" component={ChatScreen} />
+          <Stack.Screen
+            name="ArticleScreen"
+            component={ArticleScreen}
+            initialParams={{}}
+          />
         </>
       ) : (
         <Stack.Navigator>

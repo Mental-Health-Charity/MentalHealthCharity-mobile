@@ -11,6 +11,14 @@ export interface Article {
   creation_date: string;
 }
 
+export interface ArticleItem {
+  author: string;
+  publishedAt: string;
+  title: string;
+  content: string;
+  src: string;
+}
+
 export interface Articles {
   items: Article[];
   total: number;
@@ -19,7 +27,22 @@ export interface Articles {
   pages: number;
 }
 
-export const getArticle = async (page: number, size: number) => {
+export const getArticle = async (articleId: string) => {
+  try {
+    const headers = await getCookiesAuth();
+    console.log(headers);
+    const res = await axios.get(
+      `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/${articleId}/detail`,
+      { headers: { Authorization: `${headers}` } }
+    );
+    const data: ArticleItem = res.data;
+    return data;
+  } catch (error) {
+    console.log("Błąd w pobieraniu danych", error);
+  }
+};
+
+export const getArticles = async (page: number, size: number) => {
   try {
     const headers = await getCookiesAuth();
     console.log(headers);
