@@ -1,7 +1,7 @@
 import { useContext, createContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
-import { createCookies } from "../utils/cookies";
+import { createCookies, getCookiesAuth } from "../utils/cookies";
 
 export interface User {
   full_name: string;
@@ -16,6 +16,11 @@ export interface User {
 interface LoginUserData {
   username: string;
   password: string;
+}
+
+export interface PublicProfile {
+  avatar_url: string;
+  description: string;
 }
 
 interface AccessToken {
@@ -125,6 +130,27 @@ const useProvideAuth = (userData: User | null) => {
     } catch (err) {
       console.error("Błąd podczas wylogowywania:", error);
     }
+  };
+
+  const editPublicProfile = async (
+    id: number,
+    publicProfileData: PublicProfile
+  ) => {
+    const headers = await getCookiesAuth();
+
+    const res = axios.put(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/user-public-profile/${id}`,
+      publicProfileData,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${headers?.jwtToken}, ${headers?.jwtTokenType}`,
+        },
+      }
+    );
+
+    const data = (await res).data;
+    return data as User;
   };
 
   return {

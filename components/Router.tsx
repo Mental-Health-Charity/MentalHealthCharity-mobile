@@ -16,9 +16,10 @@ import Profile from "../app/tabs/Profile";
 import Register from "../app/auth/Register";
 import Chats from "../app/tabs/Chats";
 import ChatScreen from "./chat/ChatScreen";
-import Posts from "../app/tabs/Posts";
 import ArticleScreen from "../app/screens/ArticleScreen";
 import ProfileModal from "./profile/profileModal";
+import Icon from "react-native-vector-icons//MaterialIcons";
+import { View } from "react-native";
 
 export type AuthStackParamList = {
   Login: undefined;
@@ -48,12 +49,33 @@ export const MyTabs = () => {
 
   return (
     <>
-      <Tab.Navigator>
-        <Tab.Screen name="Home" component={Home} />
-        <Tab.Screen name="Chats" component={Chats} />
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarActiveBackgroundColor: "rgb(250 204 21)",
+          tabBarActiveTintColor: "black",
+        }}
+      >
+        <Tab.Screen
+          name="Home"
+          component={Home}
+          options={{
+            tabBarIcon: () => <Icon name="home" size={24} color={"black"} />,
+          }}
+        />
+        <Tab.Screen
+          name="Chats"
+          component={Chats}
+          options={{
+            tabBarIcon: () => <Icon name="chat" size={24} color={"black"} />,
+          }}
+        />
         <Tab.Screen
           name="Profile"
           component={Profile}
+          options={{
+            tabBarIcon: () => <Icon name="person" size={24} color={"black"} />,
+          }}
           listeners={{
             tabPress: () => {
               console.log("Im opening");
@@ -61,13 +83,13 @@ export const MyTabs = () => {
             },
           }}
         />
-        <Tab.Screen name="Posts" component={Posts} />
       </Tab.Navigator>
       <ProfileModal
         isVisible={isModalVisible}
         onClose={closeModal}
         username={user?.username}
         role={user?.user_role}
+        description="I am the description"
         onLogout={() => logout()}
       />
     </>

@@ -17,7 +17,7 @@ const PrimaryButton = (props: Props) => {
     <>
       <TouchableOpacity
         onPress={onPress}
-        className="w-full bg-yellow-500 p-3 rounded-2xl mb-3 "
+        className="w-full bg-yellow-500 p-3 text-center rounded-2xl mb-3 "
       >
         <Text className="text-white">{title}</Text>
       </TouchableOpacity>

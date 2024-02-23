@@ -1,19 +1,24 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   Animated,
+  Image,
 } from "react-native";
 import Modal from "react-native-modal";
-
 import Icon from "react-native-vector-icons/MaterialIcons";
+import PrimaryButton from "../common/PrimaryButton";
+import ChangePictureModal from "./editProfilePicModal";
+import { PublicProfile, useAuth } from "../../app/contexts/authContext";
 
 interface UserModalProps {
   isVisible: boolean;
   username: string | undefined;
   role: string | undefined;
+  image?: string;
+  description?: string;
   onClose: () => void;
   onLogout: () => void;
 }
@@ -21,10 +26,14 @@ interface UserModalProps {
 const ProfileModal = ({
   isVisible,
   username,
+  description,
   role,
+  image,
   onClose,
   onLogout,
 }: UserModalProps) => {
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [editedProfile, setEditedProfile] = useState<PublicProfile>();
   const slideAnimation = useRef(new Animated.Value(400)).current;
 
   const slideIn = () => {
@@ -61,15 +70,35 @@ const ProfileModal = ({
       onBackdropPress={onClose}
       style={[styles.modal, { transform: [{ translateX: slideAnimation }] }]}
     >
-      <Animated.View style={styles.modalContent}>
-        <Text style={styles.text}>Username: {username}</Text>
-        <Text style={styles.text}>Role: {role}</Text>
-        <TouchableOpacity className="mt-4 p-2 bg-blue-500" onPress={onLogout}>
-          <Text className="text-white">Logout</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+      <Animated.View className="flex flex-col items-center px-4 py-1 gap-5  text-center min-h-[90vh] rounded-xl box">
+        <TouchableOpacity className="absolute top-0 right-0" onPress={onClose}>
           <Icon name="exit-to-app" size={24} color="#333" />
         </TouchableOpacity>
+        <View className="flex flex-col h-full mx-auto w-[70%] pt-10">
+          <Text className="w-full text-start font-bold text-lg whitespace-nowrap">
+            Profil użytkownika
+          </Text>
+          <View className="flex flex-wrap w-full pt-14 mx-auto ">
+            <TouchableOpacity onPress={() => setIsModalOpen(true)}>
+              <Image
+                source={
+                  image ? { uri: image } : require("../../assets/user.png")
+                }
+                className="rounded-full max-w-[5.5em] max-h-[5em] w-fit mr-1 overflow-hidden "
+              />
+              <ChangePictureModal
+                setIsModalOpen={setIsModalOpen} // Ustawiamy poprzez funkcję, aby poprawnie zmieniać stan
+                isModalOpen={isModalOpen}
+              />
+            </TouchableOpacity>
+            <Text className="mt-5 text-base font-bold"> {username}</Text>
+            <Text className="font-bold text-base">Role: {role}</Text>
+            <Text className=" text-base font-normal mt-10">{description}</Text>
+          </View>
+          <View className="w-full flex justify-center mt-48">
+            <PrimaryButton title="Wyloguj się" onPress={onLogout} />
+          </View>
+        </View>
       </Animated.View>
     </Modal>
   );
