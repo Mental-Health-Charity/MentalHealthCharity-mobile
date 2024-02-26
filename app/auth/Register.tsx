@@ -61,7 +61,7 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
       <StatusBar style="light" />
       <Image
         className="absolute w-full h-full"
-        source={require("../../assets/background.png")}
+        source={require("../../assets/herowave.png")}
       />
       <View className="fixed flex justify-around w-full h-full pt-24 pb-10">
         <View className="flex items-center">

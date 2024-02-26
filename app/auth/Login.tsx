@@ -51,7 +51,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
       <StatusBar style="light" />
       <Image
         className="absolute w-full h-full"
-        source={require("../../assets/background.png")}
+        source={require("../../assets/herowave.png")}
       />
       <View className="flex justify-around w-full h-full pt-24 pb-10">
         <View className="flex items-center">
@@ -87,7 +87,7 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
 
                 <Animated.View
                   entering={FadeInDown.delay(200).duration(1000).springify()}
-                  className="w-full p-5 bg-gray-300 rounded-2xl"
+                  className="w-full p-5 mt-2 bg-gray-300 rounded-2xl"
                 >
                   <TextInput
                     placeholder="Hasło"

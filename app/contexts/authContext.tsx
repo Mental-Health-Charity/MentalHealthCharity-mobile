@@ -2,6 +2,7 @@ import { useContext, createContext, useState, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import axios from "axios";
 import { createCookies, getCookiesAuth } from "../utils/cookies";
+import Roles from "../utils/roles";
 
 export interface User {
   full_name: string;
@@ -9,8 +10,16 @@ export interface User {
   email: string;
   password: string;
   user_role?: string;
+  avatar_url?: string;
   id?: number;
   is_active?: boolean;
+}
+
+export interface EditUser {
+  full_name: string;
+  user_role: Roles;
+  is_active: boolean;
+  password?: string;
 }
 
 interface LoginUserData {
@@ -139,7 +148,7 @@ const useProvideAuth = (userData: User | null) => {
     const headers = await getCookiesAuth();
 
     const res = axios.put(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/v1/user-public-profile/${id}`,
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/user-public-profile/${id}`,
       publicProfileData,
       {
         headers: {
