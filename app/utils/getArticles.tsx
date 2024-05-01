@@ -1,14 +1,22 @@
 import axios from "axios";
 import { User } from "../contexts/authContext";
 import { getCookiesAuth } from "./cookies";
+import Roles from "./roles";
+import { Status } from "../contexts/adminContext";
 
 export interface Article {
   title: string;
   content: string;
   banner_url: string;
+  video_url: string;
   id: number;
+  article_category: any;
+  minimal_role: string;
+  status: string;
+  reject_message: string;
   created_by: User;
   creation_date: string;
+  required_role?: "ANYONE" | Roles.admin | Roles.volunteer;
 }
 
 export interface ArticleItem {
@@ -35,22 +43,26 @@ export const getArticle = async (articleId: string) => {
       `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/${articleId}/detail`,
       { headers: { Authorization: `${headers}` } }
     );
-    const data: ArticleItem = res.data;
+    const data: Article = res.data;
     return data;
   } catch (error) {
     console.log("Błąd w pobieraniu danych", error);
   }
 };
 
-export const getArticles = async (page: number, size: number) => {
+export const getArticles = async (
+  page: number,
+  size: number,
+  status: string | Status
+) => {
   try {
     const headers = await getCookiesAuth();
     console.log(headers);
     const res = await axios.get(
-      `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/?page=${page}&size=${size}`,
+      `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/public/?page=${page}&size=${size}`,
       { headers: { Authorization: `${headers}` } }
     );
-    const data: Article = res.data;
+    const data: Articles = res.data;
     return data;
   } catch (error) {
     console.log("Błąd w pobieraniu danych", error);
@@ -61,7 +73,7 @@ export const getVolunteerCourses = async (page: number, size: number) => {
   const headers = await getCookiesAuth();
 
   const res = await axios.get(
-    `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/?page=${page}&size=${size}`,
+    `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/public/?page=${page}&size=${size}`,
     {
       headers: {
         Authorization: `Bearer ${headers?.jwtToken}`,

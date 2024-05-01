@@ -4,63 +4,79 @@ import { ChatData, Chat, Message, Messages } from "../../app/utils/chatTypes";
 import { useAuth, User } from "../../app/contexts/authContext";
 
 import React, { useEffect, useState } from "react";
-import { FlatList, TouchableOpacity } from "react-native-gesture-handler";
-import { GiftedChat } from "react-native-gifted-chat";
+import { GiftedChat, IMessage } from "react-native-gifted-chat";
 import { RouteProp, useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { MainStackParamList } from "../Router";
 
 type Props = {
   route: RouteProp<Record<string, object | undefined>, "ChatScreen">;
 };
 
 const ChatScreen = ({ route }: Props) => {
-  const navigation = useNavigation();
+  const navigation: NativeStackNavigationProp<MainStackParamList, "Chats"> =
+    useNavigation();
   const { user } = useAuth();
-  const { getMessages, sendMessage } = useChat();
+  const { getMessages, sendMessage, selectedChat, wsMessages, setWsMessages } =
+    useChat();
 
-  const [messages, setMessages] = useState<Messages | null>(null);
+  // const [messages, setMessages] = useState<Messages | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    const readMessages = async (chat: Chat) => {
+  if (!selectedChat && user === null) {
+    return <p>Nie wybrales lub user nie istnieje</p>;
+    // przeniesienie do listy chatów, bo uzytkownik nie wybral czatu
+  }
+
+  const readMessages = async (chat: Chat) => {
+    if (selectedChat) {
+      console.log("Selected chat:", selectedChat);
       setIsLoading(true);
       try {
-        const items = await getMessages(1, 100, chat?.id);
-        setMessages(items);
-        console.log(items);
+        const data = getMessages(1, 30, selectedChat?.id);
+        const transformedMessages: IMessage[] = (await data).items.map(
+          (message: Message) => ({
+            _id: message.id.toString(), // Convert id to string if necessary
+            text: message.content,
+            createdAt: new Date(message.creation_date),
+            user: {
+              _id: message.sender.id || "",
+              avatar: message.sender.avatar_url,
+              name: message.sender.full_name,
+            },
+          })
+        );
+
+        setWsMessages(transformedMessages);
       } catch (error) {
-        console.log("Error retrieving data ", error);
+        console.error(error);
+        navigation.navigate("Chats");
       }
       setIsLoading(false);
-    };
-    readMessages();
-  }, []);
+    }
+  };
 
-  const messagesArray = messages?.items || [];
-
-  // const handleChatRedirect = (item: any) => {
-  //   // router.push(`(chats)/${item.id}`);
-  //   console.log(`Pressed on chat with ID: ${item.id}`);
-  // };
-
-  // const renderChatItem = ({ item }: { item: Chat }) => {
-  //   return (
-  //     <TouchableOpacity onPress={() => handleChatRedirect(item)}>
-  //       <View className="flex-row items-center p-16 border-b-1 border-cyan-300">
-  //         <View className="flex-1">
-  //           <Text className="text-base font-bold">{item.name}</Text>
-  //         </View>
-  //       </View>
-  //     </TouchableOpacity>
-  //   );
-  // };
+  useEffect(() => {
+    if (selectedChat) {
+      readMessages(selectedChat);
+    }
+  }, [selectedChat]);
 
   return (
-    <View>
-      <View>
+    <View id="ChatScreen">
+      <View className="h-full">
         <GiftedChat
-          messages={messages}
-          //onSend={(newMessages) => onSend(newMessages)}
-          user={{ _id: 1 }}
+          messages={wsMessages}
+          user={{
+            _id: user?.id || "",
+            avatar: user?.avatar_url,
+            name: user?.full_name,
+          }}
+          onSend={(messages) =>
+            selectedChat
+              ? sendMessage(selectedChat?.id, messages[0].text)
+              : console.log("selectedChat nie istnieje")
+          }
         />
       </View>
     </View>

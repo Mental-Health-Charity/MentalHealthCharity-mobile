@@ -6,7 +6,6 @@ import Roles from "../utils/roles";
 
 export interface User {
   full_name: string;
-  username: string;
   email: string;
   password: string;
   user_role?: string;
@@ -67,7 +66,7 @@ const useProvideAuth = (userData: User | null) => {
   // i po prostu aktualizujesz dane usera, czy nic sie nie zmienilo od ostatniego wejscia na apke
 
   const signIn = async (newUserParams: User) => {
-    const { username, password, full_name } = newUserParams;
+    const { email, password, full_name } = newUserParams;
     console.log(newUserParams);
     const res = await axios.post(
       `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/users/open`,
@@ -79,7 +78,7 @@ const useProvideAuth = (userData: User | null) => {
       }
     );
     const data: AccessToken = await res.data;
-    await login({ username, password });
+    await login({ username: email, password });
     if (res.status === 200) {
       setError(undefined);
     } else {
@@ -119,7 +118,6 @@ const useProvideAuth = (userData: User | null) => {
           }
         );
         const userDataValue = (await getUserData).data;
-        console.log("userData from api", userDataValue);
         setUser(userDataValue);
         setError(undefined);
       }
@@ -141,11 +139,33 @@ const useProvideAuth = (userData: User | null) => {
     }
   };
 
+  const getPublicProfile = async (
+    id: number,
+    publicProfileData: PublicProfile
+  ) => {
+    const headers = await getCookiesAuth();
+    console.log(headers);
+
+    const res = axios.get(
+      `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/user-public-profile/${id}`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${headers?.jwtToken}, ${headers?.jwtTokenType}`,
+        },
+      }
+    );
+
+    const data = (await res).data;
+    return data as User;
+  };
+
   const editPublicProfile = async (
     id: number,
     publicProfileData: PublicProfile
   ) => {
     const headers = await getCookiesAuth();
+    console.log(headers);
 
     const res = axios.put(
       `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/user-public-profile/${id}`,
@@ -168,6 +188,8 @@ const useProvideAuth = (userData: User | null) => {
     login,
     logout,
     signIn,
+    getPublicProfile,
+    editPublicProfile,
     error,
   };
 };

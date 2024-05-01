@@ -6,15 +6,21 @@ import { useEffect, useState } from "react";
 import { Chat, ChatData } from "../utils/chatTypes";
 import ChatListObject from "../../components/chat/chatListObject";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ChatStackParamList } from "../../components/Router";
+import PrimaryButton from "../../components/common/PrimaryButton";
+import { useNavigation } from "@react-navigation/native";
+import { MainStackParamList } from "../../components/Router";
+//import { ChatStackParamList } from "../../components/Router";
 
 type Props = {};
 
 const Chats = (props: Props) => {
+  const navigation: NativeStackNavigationProp<
+    MainStackParamList,
+    "SendChatRequest"
+  > = useNavigation();
   const { user } = useAuth();
-  const { getChats } = useChat();
+  const { getChats, setSelectedChat } = useChat();
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [chats, setChats] = useState<ChatData | null>(null);
 
   useEffect(() => {
@@ -33,9 +39,24 @@ const Chats = (props: Props) => {
 
   const chatsArray = chats?.items || [];
 
+  if (chatsArray.length === 0) {
+    return (
+      <View>
+        <Text className="w-full m-1">
+          Brak czatów do wyświetlenia, jeśli chcesz uzyskać dostęp wypełnij
+          formularz
+        </Text>
+        <PrimaryButton
+          title="Zgłoś się"
+          onPress={() => navigation.navigate("SendChatRequest")}
+        />
+      </View>
+    );
+  }
+
   return (
-    <View>
-      <Text className="w-full m-1">Czat</Text>
+    <View id="czaty">
+      <Text className="w-full mx-6 my-4 text-2xl font-bold">Czat</Text>
       <View>
         <FlatList
           data={chatsArray}

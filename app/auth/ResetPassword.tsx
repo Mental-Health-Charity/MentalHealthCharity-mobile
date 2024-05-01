@@ -10,16 +10,12 @@ import { Toast } from "toastify-react-native";
 type Props = {};
 
 const changePasswordValidationSchema = yup.object().shape({
-  password: yup.string().required("Password is required"),
-  confirmPassword: yup
-    .string()
-    .oneOf([yup.ref("password")], "Passwords must match"),
+  email: yup.string().required("Email is required"),
 });
 
 const ChangePassword = (props: Props) => {
   const initialValues = {
-    password: "",
-    confirmPassword: "",
+    email: "",
   };
   return (
     <View className="w-full h-full bg-white">
@@ -42,7 +38,7 @@ const ChangePassword = (props: Props) => {
             validationSchema={changePasswordValidationSchema}
             initialValues={initialValues}
             onSubmit={(values) => {
-              if (!values.password || !values.confirmPassword) {
+              if (!values.email) {
                 Toast.error("Proszę uzupełnić wszystkie pola", "top");
                 return;
               }
@@ -51,7 +47,7 @@ const ChangePassword = (props: Props) => {
                 console.log(values);
               } catch (error) {
                 Toast.error(
-                  "Logowanie nie powiodło się, spróbuj ponownie",
+                  "Nie można wysłać wiadomości. Spróbuj ponownie",
                   "top"
                 );
               }
@@ -64,28 +60,17 @@ const ChangePassword = (props: Props) => {
                   className="w-full p-5 bg-gray-300 rounded-2xl"
                 >
                   <TextInput
-                    onChangeText={handleChange("password")}
-                    onBlur={handleBlur("password")}
-                    value={values.password}
+                    onChangeText={handleChange("email")}
+                    onBlur={handleBlur("email")}
+                    value={values.email}
                     placeholder="Hasło"
                     placeholderTextColor={"grey"}
                   />
                 </Animated.View>
-
-                <Animated.View
-                  entering={FadeInDown.delay(200).duration(1000).springify()}
-                  className="w-full p-5 mt-2 bg-gray-300 rounded-2xl"
-                >
-                  <TextInput
-                    placeholder="Potwierdź hasło"
-                    placeholderTextColor={"grey"}
-                    onChangeText={handleChange("confirmPassword")}
-                    onBlur={handleBlur("confirmPassword")}
-                    value={values.password}
-                    secureTextEntry
-                  />
-                </Animated.View>
-                <PrimaryButton title="Zresetuj hasło" onPress={handleSubmit} />
+                <PrimaryButton
+                  title="Wyślij link do resetu"
+                  onPress={handleSubmit}
+                />
               </>
             )}
           </Formik>

@@ -20,16 +20,25 @@ import ArticleScreen from "../app/screens/ArticleScreen";
 import ProfileModal from "./profile/profileModal";
 import Icon from "react-native-vector-icons//MaterialIcons";
 import { View } from "react-native";
+import PublicUserProfile from "../app/screens/PublicUserProfileScreen";
+import Header from "./common/Header";
+import WelcomeScreen from "../app/screens/WelcomeScreen";
 
 export type AuthStackParamList = {
+  Welcome: undefined;
   Login: undefined;
   Register: undefined;
+  ChangePassword: undefined;
 };
 
 export type MainStackParamList = {
+  Chats?: undefined;
   ChatScreen?: undefined;
   AuthScreens?: undefined;
   ArticleScreen?: any;
+  Tabs: undefined;
+  PublicUserProfileScreen?: any;
+  SendChatRequest: undefined;
 };
 
 const Stack = createNativeStackNavigator<MainStackParamList>();
@@ -87,7 +96,7 @@ export const MyTabs = () => {
       <ProfileModal
         isVisible={isModalVisible}
         onClose={closeModal}
-        username={user?.username}
+        username={user?.full_name}
         role={user?.user_role}
         description="I am the description"
         onLogout={() => logout()}
@@ -99,6 +108,11 @@ export const MyTabs = () => {
 const AuthScreens = () => {
   return (
     <AuthStack.Navigator>
+      <AuthStack.Screen
+        name="Welcome"
+        component={WelcomeScreen}
+        options={{ headerShown: false }}
+      />
       <AuthStack.Screen
         name="Login"
         component={Login}
@@ -118,25 +132,26 @@ const Router = () => {
 
   return (
     <NavigationContainer>
-      {user ? (
-        <>
-          <MyTabs />
-          <Stack.Screen name="ChatScreen" component={ChatScreen} />
-          <Stack.Screen
-            name="ArticleScreen"
-            component={ArticleScreen}
-            initialParams={{}}
-          />
-        </>
-      ) : (
-        <Stack.Navigator>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {user ? (
+          <>
+            <Stack.Screen name="Tabs" component={MyTabs} />
+            <Stack.Screen name="ChatScreen" component={ChatScreen} />
+            <Stack.Screen name="ArticleScreen">
+              {(props: any) => <ArticleScreen {...props} id={null} />}
+            </Stack.Screen>
+            <Stack.Screen name="PublicUserProfileScreen">
+              {(props: any) => <PublicUserProfile {...props} id={null} />}
+            </Stack.Screen>
+          </>
+        ) : (
           <Stack.Screen
             name="AuthScreens"
             component={AuthScreens}
             options={{ headerShown: false }}
           />
-        </Stack.Navigator>
-      )}
+        )}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 };

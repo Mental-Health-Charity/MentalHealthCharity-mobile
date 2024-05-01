@@ -29,11 +29,20 @@ export interface Chat {
   participants?: User[];
 }
 
-export interface Message extends IMessage {
+// export interface Message extends IMessage {
+//   content: string;
+//   id: number;
+//   sender: User;
+//   creation_date: string;
+// }
+
+export interface Message {
   content: string;
+
+  creation_date: string;
   id: number;
   sender: User;
-  creation_date: string;
+  isPending?: boolean;
 }
 
 export interface Messages {

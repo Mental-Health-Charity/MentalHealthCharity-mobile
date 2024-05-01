@@ -22,6 +22,7 @@ import * as yup from "yup";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../components/Router";
+import { Toast } from "toastify-react-native";
 
 type MyValues = {
   username: string;
@@ -67,7 +68,19 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             validationSchema={loginValidationSchema}
             initialValues={initialValues}
             onSubmit={(values) => {
-              login(values);
+              if (!values.username || !values.password) {
+                Toast.error("Proszę uzupełnić wszystkie pola", "top");
+                return;
+              }
+
+              try {
+                login(values);
+              } catch (error) {
+                Toast.error(
+                  "Logowanie nie powiodło się, spróbuj ponownie",
+                  "top"
+                );
+              }
             }}
           >
             {({ handleChange, handleSubmit, handleBlur, values }) => (
@@ -114,7 +127,15 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
           <Text className="text-center text-gray-400 ">
             Nie masz konta?
             <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-              <Text className="m-auto text-blue-400 ">Zarejestruj się</Text>
+              <Text className="my-auto text-blue-400 ">Zarejestruj się</Text>
+            </TouchableOpacity>
+          </Text>
+          <Text className="text-center text-gray-400 ">
+            Nie pamiętasz hasło?
+            <TouchableOpacity
+              onPress={() => navigation.navigate("ChangePassword")}
+            >
+              <Text className="my-auto text-blue-400 ">Zresetuj hasło</Text>
             </TouchableOpacity>
           </Text>
         </Animated.View>

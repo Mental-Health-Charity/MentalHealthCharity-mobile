@@ -1,26 +1,41 @@
-import { View, Text, TouchableOpacity, TextInput } from "react-native";
-import { Dispatch, SetStateAction } from "react";
+import { View, Text, TouchableOpacity, TextInput, Image } from "react-native";
+import { Dispatch, SetStateAction, useState } from "react";
 import { PublicProfile } from "../../app/contexts/authContext";
+// import * as yup from "yup";
+// import { Formik } from "formik";
+import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import PrimaryButton from "../common/PrimaryButton";
+import { setChatAvatar } from "./lib/setChatAvatar";
 
 interface ChangePictureModalProps {
-  setEditedProfile?: any;
-  editedProfile?: PublicProfile | undefined;
-  setIsModalOpen: any;
-  handleEditProfile?: () => Promise<void>;
+  setIsModalOpen: Dispatch<SetStateAction<boolean>>;
   isModalOpen: boolean;
 }
 
 const ChangePictureModal = ({
-  editedProfile,
-  setEditedProfile,
   setIsModalOpen,
-  handleEditProfile,
+
   isModalOpen,
 }: ChangePictureModalProps) => {
+  const [image, setImage] = useState<any>();
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
+  console.log("Image: ", image);
   return (
     <Modal
       isVisible={isModalOpen}
@@ -34,15 +49,22 @@ const ChangePictureModal = ({
         <Icon name="close" size={24} color="#333" />
       </TouchableOpacity>
       <Text className="font-bold text-lg">Edytuj zdjęcie profilowe</Text>
-      <TextInput
-        className="rounded-xl border-2 border-gray-300 bg-gray-50 w-5/6 p-3"
-        placeholder="Wklej URL zdjęcia profilowego"
-        placeholderTextColor={"grey"}
+      <PrimaryButton
+        title="Wybierz zdjecie"
+        onPress={() => {
+          pickImage(), console.log("Image: ", image);
+        }}
       />
+      {image && (
+        <Image
+          source={{ uri: image.uri }}
+          style={{ width: 200, height: 200 }}
+        />
+      )}
       <View className="w-5/6">
         <PrimaryButton
           title="Ustaw zdjęcie"
-          onPress={() => console.log("Hello")}
+          onPress={() => setChatAvatar(image)}
         />
       </View>
 

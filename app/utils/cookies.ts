@@ -63,3 +63,20 @@ export const restoreUserSession = async () => {
     return null; // Zwracamy null w przypadku błędu
   }
 };
+
+// odpowiednik mojego getCookiesAuth.
+export const getCookiesHeaders = async () => {
+  const headers = new Headers();
+
+  const jwtToken = await SecureStore.getItemAsync("jwtToken");
+  const jwtTokenType = await SecureStore.getItemAsync("jwtTokenType");
+
+  // console.error(jwtTokenType);
+
+  headers.append("Content-Type", "application/json");
+  headers.append("Authorization", `${jwtTokenType} ${jwtToken}`);
+
+  // console.warn('headers ', headers);
+
+  return headers;
+};

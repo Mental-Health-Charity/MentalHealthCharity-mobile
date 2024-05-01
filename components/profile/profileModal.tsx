@@ -12,6 +12,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import PrimaryButton from "../common/PrimaryButton";
 import ChangePictureModal from "./editProfilePicModal";
 import { PublicProfile, useAuth } from "../../app/contexts/authContext";
+import { setChatAvatar } from "./lib/setChatAvatar";
 
 interface UserModalProps {
   isVisible: boolean;
@@ -33,7 +34,6 @@ const ProfileModal = ({
   onLogout,
 }: UserModalProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [editedProfile, setEditedProfile] = useState<PublicProfile>();
   const slideAnimation = useRef(new Animated.Value(400)).current;
 
   const slideIn = () => {
@@ -75,10 +75,10 @@ const ProfileModal = ({
           <Icon name="exit-to-app" size={24} color="#333" />
         </TouchableOpacity>
         <View className="flex flex-col h-full mx-auto w-[70%] pt-10">
-          <Text className="w-full text-start font-bold text-lg whitespace-nowrap">
+          <Text className="w-full text-lg font-bold text-start whitespace-nowrap">
             Profil użytkownika
           </Text>
-          <View className="flex flex-wrap w-full pt-14 mx-auto ">
+          <View className="flex flex-wrap w-full mx-auto pt-14 ">
             <TouchableOpacity onPress={() => setIsModalOpen(true)}>
               <Image
                 source={
@@ -86,16 +86,18 @@ const ProfileModal = ({
                 }
                 className="rounded-full max-w-[5.5em] max-h-[5em] w-fit mr-1 overflow-hidden "
               />
-              <ChangePictureModal
-                setIsModalOpen={setIsModalOpen} // Ustawiamy poprzez funkcję, aby poprawnie zmieniać stan
-                isModalOpen={isModalOpen}
-              />
+              {
+                <ChangePictureModal
+                  setIsModalOpen={setIsModalOpen}
+                  isModalOpen={isModalOpen}
+                />
+              }
             </TouchableOpacity>
             <Text className="mt-5 text-base font-bold"> {username}</Text>
-            <Text className="font-bold text-base">Role: {role}</Text>
-            <Text className=" text-base font-normal mt-10">{description}</Text>
+            <Text className="text-base font-bold">Role: {role}</Text>
+            <Text className="mt-10 text-base font-normal ">{description}</Text>
           </View>
-          <View className="w-full flex justify-center mt-48">
+          <View className="flex justify-center w-full mt-48">
             <PrimaryButton title="Wyloguj się" onPress={onLogout} />
           </View>
         </View>

@@ -22,8 +22,7 @@ import { Field, Formik } from "formik";
 import { useAuth } from "../contexts/authContext";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../components/Router";
-import FormField from "../../components/common/FormField";
-
+import { Toast } from "toastify-react-native";
 type RegisterScreenNavigationProp = NativeStackNavigationProp<
   AuthStackParamList,
   "Register"
@@ -33,7 +32,6 @@ type RegisterValues = {
   full_name: string;
   email: string;
   password: string;
-  username: string;
 };
 
 type RegisterProps = {
@@ -41,10 +39,9 @@ type RegisterProps = {
 };
 
 const registerValidationSchema = yup.object().shape({
-  fullName: yup.string().required("Proszę podać imię i nazwisko"),
+  full_name: yup.string().required("Proszę podać imię i nazwisko"),
   email: yup.string().required("Proszę podać email"),
   password: yup.string().required("Proszę wprowadzić hasło"),
-  confirmPassword: yup.string().required("Proszę wprowadzić hasło ponownie"),
 });
 
 const Register: React.FC<RegisterProps> = ({ navigation }) => {
@@ -52,7 +49,6 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
   const initialValues: RegisterValues = {
     full_name: "",
     email: "",
-    username: "",
     password: "",
   };
 
@@ -76,54 +72,75 @@ const Register: React.FC<RegisterProps> = ({ navigation }) => {
           validationSchema={registerValidationSchema}
           initialValues={initialValues}
           onSubmit={(values) => {
-            signIn(values);
+            if (!values.full_name || !values.email || !values.password) {
+              Toast.error("Proszę uzupełnić wszystkie pola", "top");
+              return;
+            }
+
+            try {
+              signIn(values);
+            } catch (error) {
+              Toast.error(
+                "Rejstracja nie powiodła się, spróbuj ponownie",
+                "top"
+              );
+            }
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, handleChange, handleBlur, values }) => (
             <>
-              <Field
-                component={FormField}
-                placeholder="Imię i nazwosko"
-                //value={values.full_name}
-                name="full_name"
-              />
-              <Field
-                component={FormField}
-                placeholder="email"
-                name="email"
-                //value={values.email}
-              />
-              <Field
-                component={FormField}
-                placeholder="username"
-                name="username"
-                //value={values.username}
-              />
-              <Field
-                component={FormField}
-                placeholder="Hasło"
-                name="password"
-                secureTextEntry
-                //value={values.password}
-              />
+              <Animated.View
+                entering={FadeInDown.duration(1000).springify()}
+                className="w-full p-5 bg-gray-300 rounded-2xl"
+              >
+                <TextInput
+                  onChangeText={handleChange("full_name")}
+                  onBlur={handleBlur("full_name")}
+                  value={values.full_name}
+                  placeholder="Imię i nazwisko"
+                  placeholderTextColor={"grey"}
+                />
+              </Animated.View>
+
+              <Animated.View
+                entering={FadeInDown.duration(1000).springify()}
+                className="w-full p-5 bg-gray-300 rounded-2xl"
+              >
+                <TextInput
+                  onChangeText={handleChange("email")}
+                  onBlur={handleBlur("email")}
+                  value={values.email}
+                  placeholder="email"
+                  placeholderTextColor={"grey"}
+                />
+              </Animated.View>
+
+              <Animated.View
+                entering={FadeInDown.delay(200).duration(1000).springify()}
+                className="w-full p-5 mt-2 bg-gray-300 rounded-2xl"
+              >
+                <TextInput
+                  placeholder="Hasło"
+                  placeholderTextColor={"grey"}
+                  onChangeText={handleChange("password")}
+                  onBlur={handleBlur("password")}
+                  value={values.password}
+                  secureTextEntry
+                />
+              </Animated.View>
               <PrimaryButton
                 title="Zarejestruj się"
-                onPress={() => handleSubmit()}
+                onPress={() => {
+                  console.log("hello");
+                  handleSubmit();
+                }}
               />
             </>
           )}
         </Formik>
+
         <Animated.View
-          entering={FadeInDown.delay(600).duration(1000).springify()}
-        >
-          <Text className="text-center text-gray-400 ">
-            Nie masz konta?
-            <TouchableOpacity>
-              <Text className="text-blue-400 ">Zarejestruj się</Text>
-            </TouchableOpacity>
-          </Text>
-        </Animated.View>
-        <Animated.View
+          className={"flex justify-around items-center"}
           entering={FadeInDown.delay(600).duration(1000).springify()}
         >
           <Text className="text-center text-gray-400 ">

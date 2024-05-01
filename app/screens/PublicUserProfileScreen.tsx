@@ -8,16 +8,16 @@ interface UserProfileProps {
   id: number;
 }
 
-const PublicUserProfile = ({ id }: UserProfileProps) => {
+const PublicUserProfile = (props: UserProfileProps) => {
   const route = useRoute();
-  const { userId } = (route.params as { userId: any }).userId;
+  const { id } = route.params as UserProfileProps;
   const [profile, setProfile] = useState<PublicProfileData>();
   const [error, setError] = useState(false);
 
-  const getPublicProfile = async () => {
+  const getPublicProfile = async (id: number) => {
     try {
-      const profile = await getProfile(userId);
-      setProfile(profile);
+      const fetchedProfile = await getProfile(id);
+      setProfile(fetchedProfile);
     } catch (err) {
       console.error("error while downloading public profile", err);
       setError(true);
@@ -25,19 +25,25 @@ const PublicUserProfile = ({ id }: UserProfileProps) => {
   };
 
   useEffect(() => {
-    getPublicProfile();
+    getPublicProfile(id);
   }, []);
 
   if (error || !profile?.user) {
     return (
-      <View className="absolute top-0 left-0 block w-full bg-repeat bg-cover opacity-50 h-4/6 -z-10">
-        <Text>Wystąpił błąd! Profil nie istnieje.</Text>
+      <View className="flex items-center justify-center m-auto">
+        <Text className="text-xl font-bold text-black">
+          Wystąpił błąd! Profil nie istnieje.
+        </Text>
       </View>
     );
   }
 
   return (
     <View className="flex flex-col items-center px-4 py-1 gap-5  text-center min-h-[90vh] rounded-xl box">
+      <Image
+        className="absolute w-full h-full"
+        source={require("../../assets/herowave.png")}
+      />
       <View className="flex flex-col w-[70%]">
         <Text className="w-full text-start">Profil użytkownika</Text>
         <View className="flex flex-wrap w-full ">
@@ -52,7 +58,9 @@ const PublicUserProfile = ({ id }: UserProfileProps) => {
 
           <Text className="">{profile.user.full_name}</Text>
           <Text>{profile.user.user_role}</Text>
-          <Text className=" text-base font-normal mt-10">I am description</Text>
+          <Text className="mt-10 text-base font-normal ">
+            {profile.description}
+          </Text>
         </View>
       </View>
     </View>

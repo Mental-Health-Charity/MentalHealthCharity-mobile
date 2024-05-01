@@ -1,31 +1,42 @@
 import { View, Text } from "react-native";
-import React, { useState } from "react";
-import ProfileModal from "../../components/profile/profileModal";
+import React, { useEffect, useState } from "react";
+
+import UserProfile from "../screens/PublicUserProfileScreen";
+import { User } from "react-native-gifted-chat";
 import { useAuth } from "../contexts/authContext";
+import getProfile from "../utils/getProfile";
 
 type Props = {};
 
 const Profile = (props: Props) => {
-  const { logout, user } = useAuth();
-  const [isModalVisible, setModalVisible] = useState(false);
+  const { user } = useAuth();
+  const [showPublicProfile, setShowPublicProfile] = useState(false);
 
-  const openModal = () => {
-    setModalVisible(true);
+  const canAccesPublicProfile = async (id: number) => {
+    const profile = await getProfile(id);
+    console.log(profile);
+    if (profile) {
+      setShowPublicProfile(true);
+    } else {
+      setShowPublicProfile(false);
+    }
   };
-
-  const closeModal = () => {
-    setModalVisible(false);
-  };
-
+  useEffect(() => {
+    canAccesPublicProfile(user?.id as number);
+  }, []);
+  console.log(showPublicProfile);
   return (
-    <View>
-      <ProfileModal
-        isVisible={isModalVisible}
-        username={user?.username}
-        role={user?.user_role}
-        onClose={closeModal}
-        onLogout={() => logout()}
-      />
+    <View className="flex">
+      {!showPublicProfile ? (
+        <Text className="my-[50%] text-center font-semibold text-lg">
+          Użytkownik nie ma profilu publicznego
+        </Text>
+      ) : (
+        <>
+          <Text></Text>
+          <Text>Settings</Text>
+        </>
+      )}
     </View>
   );
 };

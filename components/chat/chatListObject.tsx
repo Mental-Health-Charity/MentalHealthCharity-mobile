@@ -6,12 +6,12 @@ import { useChat } from "../../app/contexts/chatContext";
 import { TouchableOpacity } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { ChatStackParamList } from "../Router";
+import { MainStackParamList } from "../Router";
 
 type ChatListProps = {
   participants: User[] | undefined;
   chat: Chat;
-  setSelectedChat: Dispatch<SetStateAction<Chat | null>>;
+  setSelectedChat: Dispatch<SetStateAction<Chat | undefined>>;
 };
 
 const ChatListObject = ({
@@ -20,17 +20,18 @@ const ChatListObject = ({
   setSelectedChat,
 }: ChatListProps) => {
   const navigation: NativeStackNavigationProp<
-    ChatStackParamList,
+    MainStackParamList,
     "ChatScreen"
   > = useNavigation();
   return (
     <>
       <TouchableOpacity
+        id="chatListItem"
         onPress={() => {
-          setSelectedChat(chat);
-          navigation.navigate("ChatScreen", { chat: chat.id });
+          setSelectedChat(chat); // Ustawia czat w kontekscie
+          navigation.navigate("ChatScreen"); // Przekierowuje do strony czatu, ;
         }}
-        className="flex flex-row items-start justify-between p-6 m-6 border-0 rounded-lg bg-slate-300"
+        className="flex flex-row items-start justify-between p-6 m-6 bg-white border-0 rounded-lg"
       >
         <Image
           source={require("../../assets/message.png")}
