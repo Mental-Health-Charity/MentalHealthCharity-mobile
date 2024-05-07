@@ -5,6 +5,7 @@ import {
   useNavigation,
 } from "@react-navigation/native";
 import { useAuth } from "../app/contexts/authContext";
+import { Text } from "react-native";
 import {
   NativeStackNavigationProp,
   createNativeStackNavigator,
@@ -23,6 +24,7 @@ import { View } from "react-native";
 import PublicUserProfile from "../app/screens/PublicUserProfileScreen";
 import Header from "./common/Header";
 import WelcomeScreen from "../app/screens/WelcomeScreen";
+import OpenProfileModalButton from "./common/openProfileModalButton";
 
 export type AuthStackParamList = {
   Welcome: undefined;
@@ -45,16 +47,7 @@ const Stack = createNativeStackNavigator<MainStackParamList>();
 const Tab = createBottomTabNavigator();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 export const MyTabs = () => {
-  const { user, logout } = useAuth();
-  const [isModalVisible, setModalVisible] = useState(false);
-
-  const openModal = () => {
-    setModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setModalVisible(false);
-  };
+  //const { user } = useAuth();
 
   return (
     <>
@@ -85,22 +78,14 @@ export const MyTabs = () => {
           options={{
             tabBarIcon: () => <Icon name="person" size={24} color={"black"} />,
           }}
-          listeners={{
-            tabPress: () => {
-              console.log("Im opening");
-              openModal();
-            },
-          }}
+          // listeners={{
+          //   tabPress: () => {
+          //     console.log("Im opening");
+          //     openModal();
+          //   },
+          // }}
         />
       </Tab.Navigator>
-      <ProfileModal
-        isVisible={isModalVisible}
-        onClose={closeModal}
-        username={user?.full_name}
-        role={user?.user_role}
-        description="I am the description"
-        onLogout={() => logout()}
-      />
     </>
   );
 };
@@ -132,7 +117,13 @@ const Router = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
+      {user ? <Header /> : <></>}
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: "#f3f7fe" },
+        }}
+      >
         {user ? (
           <>
             <Stack.Screen name="Tabs" component={MyTabs} />

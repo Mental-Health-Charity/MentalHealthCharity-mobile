@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, TextInput, Image } from "react-native";
 import { Dispatch, SetStateAction, useState } from "react";
 import { PublicProfile } from "../../app/contexts/authContext";
-// import * as yup from "yup";
+import * as yup from "yup";
 // import { Formik } from "formik";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
@@ -14,6 +14,10 @@ interface ChangePictureModalProps {
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
   isModalOpen: boolean;
 }
+
+const chatAvatarValidationSchema = yup.object().shape({
+  avatar: yup.string(),
+});
 
 const ChangePictureModal = ({
   setIsModalOpen,
@@ -39,8 +43,7 @@ const ChangePictureModal = ({
   return (
     <Modal
       isVisible={isModalOpen}
-      className="bg-slate-200 w-5/6 self-center flex items-center
-    justify-around"
+      className="flex items-center self-center justify-around w-5/6 bg-slate-200"
     >
       <TouchableOpacity
         className="absolute top-3 right-3"
@@ -48,7 +51,7 @@ const ChangePictureModal = ({
       >
         <Icon name="close" size={24} color="#333" />
       </TouchableOpacity>
-      <Text className="font-bold text-lg">Edytuj zdjęcie profilowe</Text>
+      <Text className="text-lg font-bold">Edytuj zdjęcie profilowe</Text>
       <PrimaryButton
         title="Wybierz zdjecie"
         onPress={() => {

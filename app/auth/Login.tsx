@@ -69,18 +69,12 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             initialValues={initialValues}
             onSubmit={(values) => {
               if (!values.username || !values.password) {
-                Toast.error("Proszę uzupełnić wszystkie pola", "top");
                 return;
               }
 
               try {
                 login(values);
-              } catch (error) {
-                Toast.error(
-                  "Logowanie nie powiodło się, spróbuj ponownie",
-                  "top"
-                );
-              }
+              } catch (error) {}
             }}
           >
             {({ handleChange, handleSubmit, handleBlur, values }) => (

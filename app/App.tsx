@@ -1,4 +1,5 @@
 import { AuthProvider, User } from "./contexts/authContext";
+import { RootSiblingParent } from "react-native-root-siblings";
 import Router from "../components/Router";
 import { restoreUserSession } from "./utils/cookies";
 import { useEffect, useState } from "react";
@@ -25,11 +26,13 @@ const App = () => {
   }, []);
 
   return (
-    <AuthProvider user={user}>
-      <ChatProvider>
-        <Router />
-      </ChatProvider>
-    </AuthProvider>
+    <RootSiblingParent>
+      <AuthProvider user={user}>
+        <ChatProvider>
+          <Router />
+        </ChatProvider>
+      </AuthProvider>
+    </RootSiblingParent>
   );
 };
 

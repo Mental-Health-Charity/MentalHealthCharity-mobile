@@ -9,6 +9,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import { useNavigation } from "@react-navigation/native";
 import { MainStackParamList } from "../../components/Router";
+import SendChatRequest from "../../components/chat/SendChatRequest";
 //import { ChatStackParamList } from "../../components/Router";
 
 type Props = {};
@@ -27,7 +28,7 @@ const Chats = (props: Props) => {
     const fetchedData = async () => {
       setIsLoading(true);
       try {
-        const fetchedChats = await getChats(1, 50);
+        const fetchedChats = await getChats(0, 50);
         setChats(fetchedChats);
       } catch (err) {
         console.error("Błąd podczas pobierania czatów:", err);
@@ -41,21 +42,18 @@ const Chats = (props: Props) => {
 
   if (chatsArray.length === 0) {
     return (
-      <View>
-        <Text className="w-full m-1">
+      <View className="m-5 bg-[#f3f7fe] font-normal">
+        <Text className="w-full">
           Brak czatów do wyświetlenia, jeśli chcesz uzyskać dostęp wypełnij
           formularz
         </Text>
-        <PrimaryButton
-          title="Zgłoś się"
-          onPress={() => navigation.navigate("SendChatRequest")}
-        />
+        <SendChatRequest />
       </View>
     );
   }
 
   return (
-    <View id="czaty">
+    <View id="czaty" className="bg-[#f3f7fe]">
       <Text className="w-full mx-6 my-4 text-2xl font-bold">Czat</Text>
       <View>
         <FlatList

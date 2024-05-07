@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import getProfile, { PublicProfileData } from "../utils/getProfile";
 import { PublicProfile, useAuth } from "../contexts/authContext";
 import { useRoute } from "@react-navigation/native";
+import BlogCard from "../../components/blog/blogCard";
 
 interface UserProfileProps {
   id: number;
@@ -63,6 +64,7 @@ const PublicUserProfile = (props: UserProfileProps) => {
           </Text>
         </View>
       </View>
+      {/* <BlogCard banner_url={}  /> */}
     </View>
   );
 };

@@ -1,8 +1,5 @@
 import { View, Text } from "react-native";
 import React, { useEffect, useState } from "react";
-
-import UserProfile from "../screens/PublicUserProfileScreen";
-import { User } from "react-native-gifted-chat";
 import { useAuth } from "../contexts/authContext";
 import getProfile from "../utils/getProfile";
 
