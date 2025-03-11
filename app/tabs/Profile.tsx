@@ -23,7 +23,7 @@ const Profile = (props: Props) => {
   }, []);
   console.log(showPublicProfile);
   return (
-    <View className="flex">
+    <View className="flex bg-[#f3f7fe]">
       {!showPublicProfile ? (
         <Text className="my-[50%] text-center font-semibold text-lg">
           Użytkownik nie ma profilu publicznego

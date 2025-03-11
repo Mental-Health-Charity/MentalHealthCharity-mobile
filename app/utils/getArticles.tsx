@@ -59,7 +59,7 @@ export const getArticles = async (
     const headers = await getCookiesAuth();
     console.log(headers);
     const res = await axios.get(
-      `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/public/?page=${page}&size=${size}`,
+      `https://mentalhealthcharity-backend-production.up.railway.app/api/v1/article/public/?page=${page}&size=${size}&status=${status}`,
       { headers: { Authorization: `${headers}` } }
     );
     const data: Articles = res.data;
@@ -85,4 +85,18 @@ export const getVolunteerCourses = async (page: number, size: number) => {
   const data: Articles = await res.data;
   console.log(data);
   return data;
+};
+
+export const changeArticleStatus = async (article: Article) => {
+  const headers = await getCookiesAuth();
+
+  const res = await axios.put(
+    `${process.env.EXPO_PUBLIC_BASE_URL}/api/v1/article/public`,
+    {
+      headers: {
+        Authorization: `Bearer ${headers?.jwtToken}`,
+        "Content-Type": headers?.jwtTokenType,
+      },
+    }
+  );
 };

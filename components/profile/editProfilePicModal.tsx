@@ -2,13 +2,14 @@ import { View, Text, TouchableOpacity, TextInput, Image } from "react-native";
 import { Dispatch, SetStateAction, useState } from "react";
 import { PublicProfile } from "../../app/contexts/authContext";
 import * as yup from "yup";
-// import { Formik } from "formik";
-import * as ImagePicker from "expo-image-picker";
+import { Formik } from "formik";
+
 import React from "react";
 import Modal from "react-native-modal";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import PrimaryButton from "../common/PrimaryButton";
 import { setChatAvatar } from "./lib/setChatAvatar";
+import FormField from "../common/FormField";
 
 interface ChangePictureModalProps {
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -16,7 +17,7 @@ interface ChangePictureModalProps {
 }
 
 const chatAvatarValidationSchema = yup.object().shape({
-  avatar: yup.string(),
+  avatar: yup.string().url("Podany URL nie jest poprawny"),
 });
 
 const ChangePictureModal = ({
@@ -24,57 +25,47 @@ const ChangePictureModal = ({
 
   isModalOpen,
 }: ChangePictureModalProps) => {
-  const [image, setImage] = useState<any>();
+  const [imageUri, setImageUri] = useState(null);
 
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
-    }
-  };
-
-  console.log("Image: ", image);
   return (
-    <Modal
-      isVisible={isModalOpen}
-      className="flex items-center self-center justify-around w-5/6 bg-slate-200"
-    >
+    <Modal isVisible={isModalOpen} className="bg-[#f3f7fe]">
       <TouchableOpacity
         className="absolute top-3 right-3"
         onPress={() => setIsModalOpen(false)}
       >
         <Icon name="close" size={24} color="#333" />
       </TouchableOpacity>
-      <Text className="text-lg font-bold">Edytuj zdjęcie profilowe</Text>
-      <PrimaryButton
-        title="Wybierz zdjecie"
-        onPress={() => {
-          pickImage(), console.log("Image: ", image);
-        }}
-      />
-      {image && (
-        <Image
-          source={{ uri: image.uri }}
-          style={{ width: 200, height: 200 }}
-        />
-      )}
-      <View className="w-5/6">
-        <PrimaryButton
-          title="Ustaw zdjęcie"
-          onPress={() => setChatAvatar(image)}
-        />
+      <View className="flex flex-col justify-around gap-5 m-5">
+        <Text className="mb-3 text-lg font-bold">Edytuj zdjęcie profilowe</Text>
+        <Formik
+          initialValues={{ avatar: "" }}
+          onSubmit={(values) => setChatAvatar(values.avatar)}
+          validationSchema={chatAvatarValidationSchema}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+            <View>
+              <Text>Podaj link do zdjęcia:</Text>
+              <TextInput
+                onChangeText={handleChange("avatar")}
+                onBlur={handleBlur("avatar")}
+                value={values.avatar}
+                className="p-3 mb-12 border rounded"
+              />
+              {errors.avatar && (
+                <Text className="text-red-500">{errors.avatar}</Text>
+              )}
+              {imageUri && (
+                <Image
+                  source={{ uri: imageUri }}
+                  className="mb-3 h-52 w-52 rounded-3xl"
+                  resizeMode="cover"
+                />
+              )}
+              <PrimaryButton title="Ustaw zdjęcie" onPress={handleSubmit} />
+            </View>
+          )}
+        </Formik>
       </View>
-
-      <TouchableOpacity
-        className="absolute top-3 right-10"
-        onPress={() => setIsModalOpen(false)}
-      ></TouchableOpacity>
     </Modal>
   );
 };

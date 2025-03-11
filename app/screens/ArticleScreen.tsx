@@ -6,6 +6,10 @@ import Video from "react-native-video";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { MainStackParamList } from "../../components/Router";
 import Markdown from "react-native-markdown-display";
+import { Picker } from "@react-native-picker/picker";
+import { useAuth } from "../contexts/authContext";
+import { Status } from "../contexts/adminContext";
+import PrimaryButton from "../../components/common/PrimaryButton";
 
 type PublicProfileScreenNavigationProp = NativeStackNavigationProp<
   MainStackParamList,
@@ -16,8 +20,11 @@ interface ArticleProps {
 }
 
 const ArticleScreen = (props: ArticleProps) => {
+  const { user } = useAuth();
   const navigation = useNavigation<PublicProfileScreenNavigationProp>();
   const route = useRoute();
+  const [status, setStatus] = useState<Status>(Status.PUBLISHED);
+  const statusOptions = Object.values(Status);
   const [article, setArticle] = useState<Article>();
   const { id } = route.params as ArticleProps;
 
@@ -28,6 +35,9 @@ const ArticleScreen = (props: ArticleProps) => {
     } catch (error) {
       console.log("Błąd w pobieraniu danych");
     }
+  };
+  const changeArticleStatus = (status: Status) => {
+    setStatus(status);
   };
 
   useEffect(() => {
@@ -74,6 +84,26 @@ const ArticleScreen = (props: ArticleProps) => {
       />
 
       <Markdown>{article?.content}</Markdown>
+      {user?.user_role !== "User" && (
+        <View className="gap-3 my-10 ">
+          <Text className="font-semibold ">Zmień status</Text>
+          <Picker
+            selectedValue={status}
+            onValueChange={(status) => changeArticleStatus(status as Status)}
+            className="mt-5"
+          >
+            {statusOptions.map((option, index) => (
+              <Picker.Item key={index} label={option} value={option} />
+            ))}
+          </Picker>
+          <PrimaryButton
+            title="Zatwierdź"
+            onPress={() => {
+              console.log("Zatwierdź");
+            }}
+          />
+        </View>
+      )}
     </ScrollView>
   );
 };

@@ -11,7 +11,7 @@ const OpenProfileModalButton = ({ isModalVisible }: Props) => {
     <TouchableOpacity onPress={isModalVisible}>
       <Image
         source={require("../../assets/user.png")}
-        style={{ width: 40, height: 40, margin: 5 }}
+        style={{ width: 40, height: 40, margin: 16 }}
       ></Image>
     </TouchableOpacity>
   );

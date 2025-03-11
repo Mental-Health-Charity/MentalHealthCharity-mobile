@@ -3,20 +3,19 @@ import {
   Text,
   TouchableOpacity,
   GestureResponderEvent,
+  TouchableOpacityProps,
 } from "react-native";
 import React from "react";
 
-type Props = {
+interface Props extends TouchableOpacityProps {
   title: string;
-  onPress: (event: any) => any;
-};
+}
 
-const PrimaryButton = (props: Props) => {
-  const { title, onPress } = props;
+const PrimaryButton = ({ title, ...props }: Props) => {
   return (
     <>
       <TouchableOpacity
-        onPress={onPress}
+        {...props}
         className="w-full p-3 my-3 text-center bg-yellow-500 rounded-3xl "
       >
         <Text className="font-medium text-center text-white">{title}</Text>

@@ -45,6 +45,7 @@ const Posts = (props: Props) => {
 
   useEffect(() => {
     getAllArticles(1);
+    console.log("Działam sobie");
   }, [statusOfArticles]);
 
   const loadArticles = () => {
@@ -81,7 +82,7 @@ const Posts = (props: Props) => {
   };
 
   return (
-    <>
+    <View className="bg-[#f3f7fe]">
       <View>
         {user?.user_role === Roles.admin ||
         user?.user_role === Roles.supervisor ||
@@ -105,7 +106,7 @@ const Posts = (props: Props) => {
         ) : null}
       </View>
       <View>{loadArticles()}</View>
-    </>
+    </View>
   );
 };
 

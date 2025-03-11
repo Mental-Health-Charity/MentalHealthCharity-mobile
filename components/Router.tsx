@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  DefaultTheme,
   NavigationContainer,
   RouteProp,
   useNavigation,
@@ -46,6 +47,7 @@ export type MainStackParamList = {
 const Stack = createNativeStackNavigator<MainStackParamList>();
 const Tab = createBottomTabNavigator();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
+
 export const MyTabs = () => {
   //const { user } = useAuth();
 
@@ -78,12 +80,6 @@ export const MyTabs = () => {
           options={{
             tabBarIcon: () => <Icon name="person" size={24} color={"black"} />,
           }}
-          // listeners={{
-          //   tabPress: () => {
-          //     console.log("Im opening");
-          //     openModal();
-          //   },
-          // }}
         />
       </Tab.Navigator>
     </>
@@ -121,12 +117,15 @@ const Router = () => {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          contentStyle: { backgroundColor: "#f3f7fe" },
         }}
       >
         {user ? (
           <>
-            <Stack.Screen name="Tabs" component={MyTabs} />
+            <Stack.Screen
+              options={{ contentStyle: { backgroundColor: "#F3F7FE" } }}
+              name="Tabs"
+              component={MyTabs}
+            />
             <Stack.Screen name="ChatScreen" component={ChatScreen} />
             <Stack.Screen name="ArticleScreen">
               {(props: any) => <ArticleScreen {...props} id={null} />}

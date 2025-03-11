@@ -20,7 +20,7 @@ const Header = (props: Props) => {
   };
   const navigation = useNavigation();
   return (
-    <View className="flex justify-between w-full h-16 bg-[#f3f7fe] ">
+    <View className="flex flex-row justify-between h-16 bg-[#f3f7fe] ">
       <Image
         source={require("../../assets/logo.png")}
         className="w-32 h-16 ml-5"
@@ -29,6 +29,8 @@ const Header = (props: Props) => {
       <OpenProfileModalButton isModalVisible={openModal} />
 
       <ProfileModal
+        id={user?.id}
+        email={user?.email}
         isVisible={isModalVisible}
         onClose={closeModal}
         username={user?.full_name}

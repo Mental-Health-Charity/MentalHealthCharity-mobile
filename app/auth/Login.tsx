@@ -17,13 +17,13 @@ import Animated, {
 } from "react-native-reanimated";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import { useAuth } from "../contexts/authContext";
-import { Formik } from "formik";
+import { ErrorMessage, Formik } from "formik";
 import * as yup from "yup";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { AuthStackParamList } from "../../components/Router";
-import { Toast } from "toastify-react-native";
-
+import Toast from "react-native-root-toast";
+import { errorToast } from "../utils/toasts";
 type MyValues = {
   username: string;
   password: string;
@@ -69,12 +69,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
             initialValues={initialValues}
             onSubmit={(values) => {
               if (!values.username || !values.password) {
-                return;
-              }
-
-              try {
+                errorToast("Proszę uzupełnić wszystkie pola");
+              } else {
                 login(values);
-              } catch (error) {}
+              }
             }}
           >
             {({ handleChange, handleSubmit, handleBlur, values }) => (
@@ -105,7 +103,10 @@ const Login: React.FC<LoginProps> = ({ navigation }) => {
                     secureTextEntry
                   />
                 </Animated.View>
-                <PrimaryButton title="Zaloguj się" onPress={handleSubmit} />
+                <PrimaryButton
+                  title="Zaloguj się"
+                  onPress={() => handleSubmit()}
+                />
               </>
             )}
           </Formik>

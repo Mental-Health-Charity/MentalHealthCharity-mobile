@@ -9,7 +9,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import PrimaryButton from "../../components/common/PrimaryButton";
 import { useNavigation } from "@react-navigation/native";
 import { MainStackParamList } from "../../components/Router";
-import SendChatRequest from "../../components/chat/SendChatRequest";
+import SendChatRequest from "../../components/chat/SendChatRequestTrainee";
 //import { ChatStackParamList } from "../../components/Router";
 
 type Props = {};
@@ -28,7 +28,7 @@ const Chats = (props: Props) => {
     const fetchedData = async () => {
       setIsLoading(true);
       try {
-        const fetchedChats = await getChats(0, 50);
+        const fetchedChats = await getChats(1, 50);
         setChats(fetchedChats);
       } catch (err) {
         console.error("Błąd podczas pobierania czatów:", err);
